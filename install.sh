@@ -46,18 +46,18 @@ if [ -f "$INSTALL_DIR/chrome-sandbox" ]; then
     fi
 fi
 
-# Kies juiste exec command
+# Kies juiste exec command voor .desktop file
 if [ "$SUID_OK" = true ]; then
     EXEC_CMD="$INSTALL_DIR/chrome %U"
     echo "SUID sandbox is ready."
 else
     EXEC_CMD="$INSTALL_DIR/chrome --no-sandbox %U"
-    echo "SUID sandbox not usable; Chromium will run with --no-sandbox."
+    echo "SUID sandbox not usable; Chromium will run with --no-sandbox in the menu."
 fi
 
-# Symlink naar /usr/bin
+# Symlink naar /usr/bin (alleen executable, geen flags)
 echo "Creating symlink /usr/bin/chromium..."
-sudo ln -sf "$EXEC_CMD" /usr/bin/chromium
+sudo ln -sf "$INSTALL_DIR/chrome" /usr/bin/chromium
 
 # Download SVG icon
 echo "Downloading SVG icon..."
