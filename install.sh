@@ -12,7 +12,6 @@ REVISION=$(curl -s -S $LASTCHANGE_URL)
 echo "Latest revision is $REVISION"
 
 TMP_DIR=$(mktemp -d)
-
 ZIP_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F$REVISION%2Fchrome-linux.zip?alt=media"
 ZIP_FILE="$TMP_DIR/chrome-linux.zip"
 echo "Fetching $ZIP_URL"
@@ -29,30 +28,40 @@ sudo rm -rf "$INSTALL_DIR"
 sudo mkdir -p "$INSTALL_DIR"
 sudo cp -r "$SCRIPT_DIR/latest/." "$INSTALL_DIR/"
 
+# SUID sandbox instellen
 echo "Setting up SUID sandbox..."
+SUID_OK=false
 if [ -f "$INSTALL_DIR/chrome-sandbox" ]; then
     sudo chown root:root "$INSTALL_DIR/chrome-sandbox"
     sudo chmod 4755 "$INSTALL_DIR/chrome-sandbox"
-    echo "SUID sandbox setup attempted (may not be usable)."
+    if "$INSTALL_DIR/chrome" --no-startup-window &>/dev/null; then
+        SUID_OK=true
+    fi
 fi
 
-echo "Creating wrapper script in /usr/bin/chromium..."
-sudo tee /usr/bin/chromium > /dev/null <<'EOF'
-#!/bin/bash
-exec /opt/chromium-latest/chrome --no-sandbox "$@"
-EOF
-sudo chmod +x /usr/bin/chromium
+# Kies juiste exec command voor .desktop en symlink
+if [ "$SUID_OK" = true ]; then
+    EXEC_CMD="$INSTALL_DIR/chrome %U"
+    echo "SUID sandbox is ready. Chromium will run safely."
+else
+    EXEC_CMD="$INSTALL_DIR/chrome --no-sandbox %U"
+    echo "SUID sandbox not usable; Chromium will run with --no-sandbox."
+fi
 
-echo "Downloading SVG icon..."
+# Symlink naar /usr/bin/chromium
+sudo rm -f /usr/bin/chromium
+sudo ln -s "$INSTALL_DIR/chrome" /usr/bin/chromium
+
+# SVG icon downloaden
 sudo curl -L -o "$ICON_PATH" "https://upload.wikimedia.org/wikipedia/commons/2/28/Chromium_Logo.svg"
 
-echo "Creating .desktop file..."
+# .desktop bestand
 sudo tee "$DESKTOP_FILE" > /dev/null <<EOL
 [Desktop Entry]
 Version=1.0
 Name=Chromium Latest
 Comment=The latest Chromium Browser
-Exec=/usr/bin/chromium %U
+Exec=$EXEC_CMD
 Icon=$ICON_PATH
 Terminal=false
 Type=Application
