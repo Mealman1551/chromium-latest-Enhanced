@@ -39,29 +39,39 @@ if [ -f "$INSTALL_DIR/chrome-sandbox" ]; then
     fi
 fi
 
-# Kies juiste exec command voor .desktop en symlink
 if [ "$SUID_OK" = true ]; then
-    EXEC_CMD="$INSTALL_DIR/chrome %U"
     echo "SUID sandbox is ready. Chromium will run safely."
 else
-    EXEC_CMD="$INSTALL_DIR/chrome --no-sandbox %U"
     echo "SUID sandbox not usable; Chromium will run with --no-sandbox."
 fi
 
-# Symlink naar /usr/bin/chromium
-sudo rm -f /usr/bin/chromium
-sudo ln -s "$INSTALL_DIR/chrome" /usr/bin/chromium
+# Wrapper-script maken voor /usr/bin/chromium
+echo "Creating wrapper script at /usr/bin/chromium..."
+sudo tee /usr/bin/chromium > /dev/null <<EOF
+#!/bin/bash
+CHROMIUM_DIR="$INSTALL_DIR"
+SANDBOX="\$CHROMIUM_DIR/chrome-sandbox"
+
+if [ -f "\$SANDBOX" ] && [ -u "\$SANDBOX" ]; then
+    exec "\$CHROMIUM_DIR/chrome" "\$@"
+else
+    exec "\$CHROMIUM_DIR/chrome" --no-sandbox "\$@"
+fi
+EOF
+sudo chmod +x /usr/bin/chromium
 
 # SVG icon downloaden
+echo "Downloading SVG icon..."
 sudo curl -L -o "$ICON_PATH" "https://upload.wikimedia.org/wikipedia/commons/2/28/Chromium_Logo.svg"
 
 # .desktop bestand
+echo "Creating .desktop file..."
 sudo tee "$DESKTOP_FILE" > /dev/null <<EOL
 [Desktop Entry]
 Version=1.0
 Name=Chromium Latest
 Comment=The latest Chromium Browser
-Exec=$EXEC_CMD
+Exec=/usr/bin/chromium %U
 Icon=$ICON_PATH
 Terminal=false
 Type=Application
