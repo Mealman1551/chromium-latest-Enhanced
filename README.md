@@ -1,5 +1,7 @@
-# chromium-latest-linux-Enhanced
+# chromium-latest-Enhanced
 This repository is a fork of [scheib/chromium-latest-linux](https://github.com/scheib/chromium-latest-linux)
+
+This repo also works for Windows.
 
 ### Linux (Default)
 
