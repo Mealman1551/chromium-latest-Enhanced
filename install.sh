@@ -10,24 +10,20 @@ LASTCHANGE_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browse
 REVISION=$(curl -s -S $LASTCHANGE_URL)
 echo "Latest revision is $REVISION"
 
-if [ ! -d "$REVISION" ]; then
-    ZIP_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F$REVISION%2Fchrome-linux.zip?alt=media"
-    ZIP_FILE="$REVISION-chrome-linux.zip"
+# Maak een tijdelijke map voor het downloaden
+TMP_DIR=$(mktemp -d)
 
-    echo "Fetching $ZIP_URL"
-    mkdir -p "$REVISION"
-    pushd "$REVISION" > /dev/null
-    curl -# -o "$ZIP_FILE" "$ZIP_URL"
-    echo "Unzipping..."
-    unzip -q "$ZIP_FILE"
-    rm "$ZIP_FILE"
-    popd > /dev/null
+ZIP_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F$REVISION%2Fchrome-linux.zip?alt=media"
+ZIP_FILE="$TMP_DIR/chrome-linux.zip"
 
-    rm -f "$SCRIPT_DIR/latest"
-    ln -s "$REVISION/chrome-linux" "$SCRIPT_DIR/latest"
-else
-    echo "Already have latest version"
-fi
+echo "Fetching $ZIP_URL"
+curl -# -o "$ZIP_FILE" "$ZIP_URL"
+
+echo "Unzipping..."
+unzip -q "$ZIP_FILE" -d "$TMP_DIR"
+
+rm -f "$SCRIPT_DIR/latest"
+ln -s "$TMP_DIR/chrome-linux" "$SCRIPT_DIR/latest"
 
 echo "Installing to $INSTALL_DIR..."
 sudo rm -rf "$INSTALL_DIR"
@@ -49,6 +45,9 @@ Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
 EOL
+
+# Verwijder tijdelijke map
+rm -rf "$TMP_DIR"
 
 echo "Installation completed."
 echo "Chromium can now be launched from the menu or by running: chromium"
