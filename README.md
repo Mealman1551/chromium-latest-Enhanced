@@ -17,6 +17,4 @@ To update Chromium installed from this script run: `install-windows.ps1`
 
 To remove Chromium run: `uninstall-windows.ps1`
 
-The `install-windows.ps1` takes really long. Be patient.
-
 ###### &copy; 2025 Mealman1551
