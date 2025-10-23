@@ -34,6 +34,16 @@ sudo rm -rf "$INSTALL_DIR"
 sudo mkdir -p "$INSTALL_DIR"
 sudo cp -r "$SCRIPT_DIR/latest/." "$INSTALL_DIR/"
 
+# SUID sandbox instellen
+echo "Setting up SUID sandbox..."
+if [ -f "$INSTALL_DIR/chrome-sandbox" ]; then
+    sudo chown root:root "$INSTALL_DIR/chrome-sandbox"
+    sudo chmod 4755 "$INSTALL_DIR/chrome-sandbox"
+    echo "SUID sandbox is ready."
+else
+    echo "No chrome-sandbox found! Chromium might need --no-sandbox."
+fi
+
 # Symlink naar /usr/bin
 echo "Creating symlink /usr/bin/chromium..."
 sudo ln -sf "$INSTALL_DIR/chrome" /usr/bin/chromium
