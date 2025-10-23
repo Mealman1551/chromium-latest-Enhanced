@@ -34,19 +34,30 @@ sudo rm -rf "$INSTALL_DIR"
 sudo mkdir -p "$INSTALL_DIR"
 sudo cp -r "$SCRIPT_DIR/latest/." "$INSTALL_DIR/"
 
-# SUID sandbox instellen
+# SUID sandbox instellen en testen
 echo "Setting up SUID sandbox..."
+SUID_OK=false
 if [ -f "$INSTALL_DIR/chrome-sandbox" ]; then
     sudo chown root:root "$INSTALL_DIR/chrome-sandbox"
     sudo chmod 4755 "$INSTALL_DIR/chrome-sandbox"
+    # Test sandbox (veilig, zonder GUI)
+    if "$INSTALL_DIR/chrome" --no-startup-window --no-sandbox-test &>/dev/null; then
+        SUID_OK=true
+    fi
+fi
+
+# Kies juiste exec command
+if [ "$SUID_OK" = true ]; then
+    EXEC_CMD="$INSTALL_DIR/chrome %U"
     echo "SUID sandbox is ready."
 else
-    echo "No chrome-sandbox found! Chromium might need --no-sandbox."
+    EXEC_CMD="$INSTALL_DIR/chrome --no-sandbox %U"
+    echo "SUID sandbox not usable; Chromium will run with --no-sandbox."
 fi
 
 # Symlink naar /usr/bin
 echo "Creating symlink /usr/bin/chromium..."
-sudo ln -sf "$INSTALL_DIR/chrome" /usr/bin/chromium
+sudo ln -sf "$EXEC_CMD" /usr/bin/chromium
 
 # Download SVG icon
 echo "Downloading SVG icon..."
@@ -59,7 +70,7 @@ sudo tee "$DESKTOP_FILE" > /dev/null <<EOL
 Version=1.0
 Name=Chromium Latest
 Comment=The latest Chromium Browser
-Exec=$INSTALL_DIR/chrome %U
+Exec=$EXEC_CMD
 Icon=$ICON_PATH
 Terminal=false
 Type=Application
