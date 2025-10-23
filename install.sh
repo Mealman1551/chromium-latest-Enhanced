@@ -20,6 +20,7 @@ if [ ! -d "$REVISION" ]; then
     curl -# -o "$ZIP_FILE" "$ZIP_URL"
     echo "Unzipping..."
     unzip -q "$ZIP_FILE"
+    rm "$ZIP_FILE"
     popd > /dev/null
 
     rm -f "$SCRIPT_DIR/latest"
