@@ -3,6 +3,9 @@ This repository is a fork of [scheib/chromium-latest-linux](https://github.com/s
 
 This repo also works for Windows.
 
+To get started check the [release tab](https://github.com/Mealman1551/chromium-latest-Enhanced/releases), and donwload the zip for 
+Windows and the tar.gz for Linux.
+
 ### Linux (Best support and more features)
 
 Prefered:
