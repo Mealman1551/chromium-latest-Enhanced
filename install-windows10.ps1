@@ -55,16 +55,18 @@ $profilePath = Join-Path $profileDir "Microsoft.PowerShell_profile.ps1"
 $chromiumUpScript = "$env:LOCALAPPDATA\Microsoft\WindowsApps\chromiumup.ps1"
 @"
 Write-Host 'Updating Chromium...'
-$wc = New-Object System.Net.WebClient
-$revision = $wc.DownloadString('$lastChangeUrl').Trim()
-$zipUrl = '$zipBase' -replace '{REV}', $revision
-$tempZip = Join-Path `$env:TEMP 'chromium-latest.zip'
-$wc.DownloadFile($zipUrl, $tempZip)
+\$wc = New-Object System.Net.WebClient
+\$revision = \$wc.DownloadString('$lastChangeUrl').Trim()
+Write-Host ('Latest revision: ' + \$revision)
+\$zipUrl = '$zipBase' -replace '{REV}', \$revision
+\$tempZip = Join-Path \$env:TEMP 'chromium-latest.zip'
+Write-Host 'Downloading Chromium revision ' + \$revision + '...'
+\$wc.DownloadFile(\$zipUrl, \$tempZip)
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-[System.IO.Compression.ZipFile]::ExtractToDirectory($tempZip, '$installDir' -Force)
-Remove-Item $tempZip -Force
-Write-Host 'Chromium updated to revision ' + $revision
-"@ | Set-Content $chromiumUpScript
+[System.IO.Compression.ZipFile]::ExtractToDirectory(\$tempZip, '$installDir', \$true)
+Remove-Item \$tempZip -Force
+Write-Host 'Chromium updated to revision ' + \$revision
+"@ | Set-Content $chromiumUpScript -Encoding UTF8
 
 Set-Content -Path $profilePath -Value ((Get-Content $profilePath -ErrorAction SilentlyContinue) + "`nSet-Alias chromiumup `"$chromiumUpScript`"") -Force
 
