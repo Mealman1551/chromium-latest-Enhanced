@@ -6,9 +6,9 @@ This repo also works for Windows.
 To get started check the [release tab](https://github.com/Mealman1551/chromium-latest-Enhanced/releases), and donwload the zip for 
 Windows and the tar.gz for Linux.
 
-### Linux (Best support and more features)
+But even better is to run the commands below for maximal compatibility.
 
-Prefered:
+### Linux (Best support and more features)
 
 Install
 ```bash
@@ -23,34 +23,21 @@ Remove
 wget -qO- https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/remove.sh | bash
 ```
 
----
-
-Just run: `install.sh` to install Chromium Latest
-
-To update Chromium installed from this script run: `install.sh`
-
-To remove Chromium run: `remove.sh`
-
 ### Windows
-
-Prefered:
 
 Install
 ```powershell
 irm https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install-windows.ps1 | iex
 ```
 
+To update Chromium type:
+```powershell
+chromiumup
+```
+
 Uninstall:
 ```powershell
 irm https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/uninstall-windows.ps1 | iex
 ```
-
----
-
-Just run: `install-windows.ps1`
-
-To update Chromium installed from this script run: `install-windows.ps1`
-
-To remove Chromium run: `uninstall-windows.ps1`
 
 ###### &copy; 2025 Mealman1551
