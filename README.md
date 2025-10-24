@@ -1,6 +1,6 @@
 # chromium-latest-Enhanced
 
-This repository is a fork of [scheib/chromium-latest-linux](https://github.com/scheib/chromium-latest-linux) and now the scripts work again and even install Chromium for you, updates with `chromiumup` command and also works for Windows.
+This repository is a fork of [scheib/chromium-latest-linux](https://github.com/scheib/chromium-latest-linux) and now the scripts work again and even install Chromium for you, updates with `chromiumup` command and also works for Windows 11.
 
 ## Downloads
 
@@ -33,10 +33,7 @@ wget -qO- https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced
 
 ## Windows
 
-Windows 10 is not compatible, use the `install-windows10.ps1` for Windows 10:
-```powershell
-irm https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install-windows10.ps1 | iex
-```
+Windows 10 not supported via command below, check end of readme.
 
 **Install:**
 
@@ -75,6 +72,13 @@ After installation do a reboot, both Linux as Windows need to initialize the `ch
 
 - No admin rights are required.
 - A reboot is recommended after installation to initialize the `chromiumup` command properly.
+
+## Windows 10
+
+Windows 10 uses a different script:
+```powershell
+irm https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install-windows10.ps1 | iex
+```
 
 ## License
 
