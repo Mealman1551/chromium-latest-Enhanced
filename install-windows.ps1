@@ -57,22 +57,22 @@ Write-Host "Creating desktop and Start Menu shortcuts..."
 Create-Shortcut (Join-Path $desktop $shortcutName)
 Create-Shortcut (Join-Path $startMenu $shortcutName)
 
-# ---- chromiumup command ----
+# ---- chromiumup command setup ----
 $windowsApps = "$env:LOCALAPPDATA\Microsoft\WindowsApps"
 $chromiumUpScript = Join-Path $windowsApps "chromiumup.ps1"
 
-@"
+@'
+$ErrorActionPreference = "Stop"
 Write-Host "Updating Chromium..."
-& pwsh -NoProfile -ExecutionPolicy Bypass -File "`"$PSScriptRoot\install-windows.ps1`""
-"@ | Out-File -Encoding UTF8 $chromiumUpScript -Force
+$temp = Join-Path $env:TEMP "install-windows.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install-windows.ps1" -OutFile $temp
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File $temp
+Remove-Item $temp -Force
+'@ | Out-File -Encoding UTF8 $chromiumUpScript -Force
 
-# Add execution policy and alias support
-if (-not (Get-Command chromiumup -ErrorAction SilentlyContinue)) {
-    Write-Host "Adding chromiumup command to PATH..."
-    $profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
-    if (-not (Test-Path $profilePath)) { New-Item -ItemType File -Path $profilePath -Force | Out-Null }
-    Add-Content $profilePath "`nSet-Alias chromiumup '$chromiumUpScript'"
-}
+Write-Host "Setting execution permissions for chromiumup..."
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+Write-Host "chromiumup installed successfully! (in $windowsApps)"
 
 Write-Host "`nChromium installed successfully!"
 Write-Host "You can now update Chromium anytime by typing: chromiumup"
