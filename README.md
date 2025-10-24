@@ -33,6 +33,11 @@ wget -qO- https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced
 
 ## Windows
 
+Windows 10 is not compatible, use the `install-windows10.ps1` for Windows 10:
+```powershell
+irm https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install-windows.ps1 | iex
+```
+
 **Install:**
 
 ```powershell
