@@ -35,6 +35,7 @@ if ($currentRevision -eq $latestRevision) {
     Set-Content $currentRevisionFile $latestRevision
 }
 
+# Shortcuts
 $desktop = [Environment]::GetFolderPath("Desktop")
 $startMenu = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
 $shortcutName = "Chromium (Latest).lnk"
@@ -57,23 +58,19 @@ Write-Host "Creating desktop and Start Menu shortcuts..."
 Create-Shortcut (Join-Path $desktop $shortcutName)
 Create-Shortcut (Join-Path $startMenu $shortcutName)
 
-# ---- chromiumup command setup ----
+# ---- chromiumup command ----
 $windowsApps = "$env:LOCALAPPDATA\Microsoft\WindowsApps"
 $chromiumUpScript = Join-Path $windowsApps "chromiumup.ps1"
 
-@'
-$ErrorActionPreference = "Stop"
-Write-Host "Updating Chromium..."
-$temp = Join-Path $env:TEMP "install-windows.ps1"
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install-windows.ps1" -OutFile $temp
-pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File $temp
-Remove-Item $temp -Force
-'@ | Out-File -Encoding UTF8 $chromiumUpScript -Force
+@"
+Write-Host 'Updating Chromium...'
+& pwsh -NoProfile -ExecutionPolicy Bypass -File `"$PSScriptRoot\install-windows.ps1`"
+"@ | Out-File -Encoding UTF8 $chromiumUpScript -Force
 
-Write-Host "Setting execution permissions for chromiumup..."
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+Write-Host "`nSetting execution permissions for chromiumup..."
+
+
 Write-Host "chromiumup installed successfully! (in $windowsApps)"
-
 Write-Host "`nChromium installed successfully!"
 Write-Host "You can now update Chromium anytime by typing: chromiumup"
 Write-Host "Location: $appDir"
