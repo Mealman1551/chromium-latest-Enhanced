@@ -6,6 +6,14 @@ $installDir = "$env:LOCALAPPDATA\Chromium"
 $appDir = Join-Path $installDir "Application"
 $userDataDir = Join-Path $installDir "User Data"
 $tempZip = Join-Path $env:TEMP "chromium.zip"
+$installScriptPath = Join-Path $installDir "install-windows.ps1"
+
+# Als het script nog niet in installDir staat, kopieer het daarheen
+if ($MyInvocation.MyCommand.Path -ne $installScriptPath) {
+    Write-Host "Copying installer to $installScriptPath..."
+    if (-not (Test-Path $installDir)) { New-Item -ItemType Directory -Path $installDir | Out-Null }
+    Copy-Item -Path $MyInvocation.MyCommand.Path -Destination $installScriptPath -Force
+}
 
 Write-Host "Checking latest Chromium revision..."
 $latestRevision = (curl.exe -s "$baseUrl/LAST_CHANGE").Trim()
@@ -35,7 +43,6 @@ if ($currentRevision -eq $latestRevision) {
     Set-Content $currentRevisionFile $latestRevision
 }
 
-# Shortcuts
 $desktop = [Environment]::GetFolderPath("Desktop")
 $startMenu = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
 $shortcutName = "Chromium (Latest).lnk"
@@ -64,13 +71,16 @@ $chromiumUpScript = Join-Path $windowsApps "chromiumup.ps1"
 
 @"
 Write-Host 'Updating Chromium...'
-& pwsh -NoProfile -ExecutionPolicy Bypass -File `"$PSScriptRoot\install-windows.ps1`"
+& pwsh -NoProfile -ExecutionPolicy Bypass -File `"$installScriptPath`"
 "@ | Out-File -Encoding UTF8 $chromiumUpScript -Force
 
-Write-Host "`nSetting execution permissions for chromiumup..."
+Write-Host "Setting execution permissions for chromiumup..."
+if (-not (Get-Command chromiumup -ErrorAction SilentlyContinue)) {
+    $profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+    if (-not (Test-Path $profilePath)) { New-Item -ItemType File -Path $profilePath -Force | Out-Null }
+    Add-Content $profilePath "`nSet-Alias chromiumup '$chromiumUpScript'"
+}
 
-
-Write-Host "chromiumup installed successfully! (in $windowsApps)"
 Write-Host "`nChromium installed successfully!"
 Write-Host "You can now update Chromium anytime by typing: chromiumup"
 Write-Host "Location: $appDir"
