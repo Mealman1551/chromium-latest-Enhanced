@@ -20,7 +20,7 @@ wget -qO- https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced
 ```
 
 **Update:**
-
+when updating close all chromium instances
 ```bash
 chromiumup
 ```
@@ -43,7 +43,7 @@ irm https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/
 ```
 
 **Update:**
-
+when updating close all chromium instances
 ```powershell
 chromiumup
 ```
