@@ -3,7 +3,7 @@ This repository is a fork of [scheib/chromium-latest-linux](https://github.com/s
 
 This repo also works for Windows.
 
-### Linux (Default)
+### Linux (Best support and more features)
 
 Prefered:
 
@@ -11,6 +11,9 @@ Install
 ```bash
 wget -qO- https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install.sh | bash
 ```
+
+To update Chromium type: `chromiumup`
+
 
 Remove
 ```bash
