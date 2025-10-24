@@ -6,36 +6,36 @@ INSTALL_DIR="/opt/chromium-latest"
 DESKTOP_FILE="/usr/share/applications/chromium-latest.desktop"
 ICON_PATH="/usr/share/icons/hicolor/scalable/apps/chromium-latest.svg"
 
+echo "=== Chromium Latest Installer ==="
+
 echo "Updating Chromium..."
 LASTCHANGE_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2FLAST_CHANGE?alt=media"
-REVISION=$(curl -s -S $LASTCHANGE_URL)
+REVISION=$(curl -s -S "$LASTCHANGE_URL")
 echo "Latest revision is $REVISION"
 
 TMP_DIR=$(mktemp -d)
 ZIP_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F$REVISION%2Fchrome-linux.zip?alt=media"
 ZIP_FILE="$TMP_DIR/chrome-linux.zip"
-echo "Fetching $ZIP_URL"
-curl -# -o "$ZIP_FILE" "$ZIP_URL"
+
+echo "Fetching Chromium build..."
+curl -# -L -o "$ZIP_FILE" "$ZIP_URL"
 
 echo "Unzipping..."
 unzip -q "$ZIP_FILE" -d "$TMP_DIR"
 
-rm -f "$SCRIPT_DIR/latest"
-ln -s "$TMP_DIR/chrome-linux" "$SCRIPT_DIR/latest"
-
 echo "Installing to $INSTALL_DIR..."
 sudo rm -rf "$INSTALL_DIR"
 sudo mkdir -p "$INSTALL_DIR"
-sudo cp -r "$SCRIPT_DIR/latest/." "$INSTALL_DIR/"
+sudo cp -r "$TMP_DIR/chrome-linux/." "$INSTALL_DIR/"
 
-# Symlink naar /usr/bin
-sudo rm -f /usr/bin/chromium
-sudo ln -s "$INSTALL_DIR/chrome" /usr/bin/chromium
+echo "Creating symlink /usr/bin/chromium..."
+sudo ln -sf "$INSTALL_DIR/chrome" /usr/bin/chromium
 
-# Download SVG icon
-sudo curl -L -o "$ICON_PATH" "https://upload.wikimedia.org/wikipedia/commons/2/28/Chromium_Logo.svg"
+echo "Downloading icon..."
+sudo mkdir -p "$(dirname "$ICON_PATH")"
+sudo curl -fsSL -o "$ICON_PATH" "https://upload.wikimedia.org/wikipedia/commons/2/28/Chromium_Logo.svg"
 
-# Maak .desktop bestand
+echo "Creating .desktop entry..."
 sudo tee "$DESKTOP_FILE" > /dev/null <<EOL
 [Desktop Entry]
 Version=1.0
@@ -50,6 +50,24 @@ EOL
 
 rm -rf "$TMP_DIR"
 
-echo "Installation completed."
-echo "On some Linux distributions it's required to run Chromium with: chromium --no-sandbox"
-echo "The .desktop entry (GUI launcher) works always."
+echo "Installing chromiumup command..."
+sudo tee /usr/local/bin/chromiumup > /dev/null <<'EOL'
+#!/bin/bash
+set -e
+echo "Chromium Updater - Fetching latest build..."
+TMP=$(mktemp)
+curl -fsSL -o "$TMP" "https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install.sh"
+chmod +x "$TMP"
+bash "$TMP"
+rm -f "$TMP"
+EOL
+sudo chmod +x /usr/local/bin/chromiumup
+
+echo
+echo "Installation completed!"
+echo "You can now run Chromium from the menu or type: chromium"
+echo "To update anytime, run: chromiumup"
+echo
+echo "On some Linux distributions it's required to run Chromium with:"
+echo "    chromium --no-sandbox"
+echo "The .desktop entry (GUI launcher) always works."

@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+echo "Chromium Updater - Fetching latest build..."
+TMP=$(mktemp)
+curl -fsSL -o "$TMP" "https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install.sh"
+chmod +x "$TMP"
+bash "$TMP"
+rm -f "$TMP"
