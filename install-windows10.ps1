@@ -25,7 +25,13 @@ Write-Host "Extracting files..."
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::ExtractToDirectory($tempZip, $installDir)
 
-# Move chrome-win to Application folder
+# Fix: remove old Application folder first to avoid overwrite errors
+if (Test-Path $appDir) {
+    Write-Host "Removing previous Chromium application..."
+    Remove-Item $appDir -Recurse -Force
+}
+
+# Move chrome-win contents to Application
 $chromeWin = Join-Path $installDir "chrome-win"
 if (Test-Path $chromeWin) {
     Move-Item "$chromeWin\*" $appDir -Force
