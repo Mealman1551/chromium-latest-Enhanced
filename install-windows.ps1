@@ -1,4 +1,4 @@
-# install-windows.ps1 — Install or update latest Chromium and chromiumup command
+# install-windows.ps1 — Install or update Chromium + chromiumup
 $ErrorActionPreference = "Stop"
 
 $baseUrl = "https://commondatastorage.googleapis.com/chromium-browser-snapshots/Win_x64"
@@ -7,10 +7,12 @@ $appDir = Join-Path $installDir "Application"
 $userDataDir = Join-Path $installDir "User Data"
 $tempZip = Join-Path $env:TEMP "chromium.zip"
 
+# --- Download & update Chromium ---
 Write-Host "Checking latest Chromium revision..."
 $latestRevision = (curl.exe -s "$baseUrl/LAST_CHANGE").Trim()
 Write-Host "Latest revision: $latestRevision"
 
+$installerPath = Join-Path $installDir "install-windows.ps1"
 $currentRevisionFile = Join-Path $installDir "version.txt"
 if (Test-Path $currentRevisionFile) {
     $currentRevision = Get-Content $currentRevisionFile -Raw
@@ -18,9 +20,7 @@ if (Test-Path $currentRevisionFile) {
     $currentRevision = ""
 }
 
-if ($currentRevision -eq $latestRevision) {
-    Write-Host "You already have the latest version ($latestRevision)."
-} else {
+if ($currentRevision -ne $latestRevision) {
     Write-Host "Downloading Chromium revision $latestRevision..."
     $downloadUrl = "$baseUrl/$latestRevision/chrome-win.zip"
     curl.exe -L -# -o $tempZip $downloadUrl
@@ -35,6 +35,7 @@ if ($currentRevision -eq $latestRevision) {
     Set-Content $currentRevisionFile $latestRevision
 }
 
+# --- Create shortcuts ---
 $desktop = [Environment]::GetFolderPath("Desktop")
 $startMenu = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
 $shortcutName = "Chromium (Latest).lnk"
@@ -57,37 +58,38 @@ Write-Host "Creating desktop and Start Menu shortcuts..."
 Create-Shortcut (Join-Path $desktop $shortcutName)
 Create-Shortcut (Join-Path $startMenu $shortcutName)
 
-# ---- chromiumup command ----
+# --- Copy installer to install dir ---
+Write-Host "Copying installer to $installerPath..."
+if (-not (Test-Path $installerPath) -or ($MyInvocation.MyCommand.Path -ne $installerPath)) {
+    Copy-Item -Path $MyInvocation.MyCommand.Path -Destination $installerPath -Force
+}
+
+# --- chromiumup command ---
 $windowsApps = "$env:LOCALAPPDATA\Microsoft\WindowsApps"
 if (-not (Test-Path $windowsApps)) { New-Item -ItemType Directory -Path $windowsApps | Out-Null }
-
 $chromiumUpScript = Join-Path $windowsApps "chromiumup.ps1"
 
-$installerPath = Join-Path $installDir "install-windows.ps1"
-
-# Ensure installer is saved for chromiumup
-Copy-Item -Path $PSCommandPath -Destination $installerPath -Force
-
 $chromiumUpContent = @"
-# chromiumup.ps1 — Update Chromium
-`$ErrorActionPreference = 'Stop'
-`$installerPath = '$installerPath'
-if (-not (Test-Path `$installerPath)) {
-    Write-Host 'Error: install-windows.ps1 not found at' `$installerPath
+Write-Host 'Updating Chromium...'
+`$installer = '$installerPath'
+if (-not (Test-Path `$installer)) {
+    Write-Error "install-windows.ps1 not found at `$installer"
     exit 1
 }
-Write-Host 'Updating Chromium...'
-& pwsh -NoProfile -ExecutionPolicy Bypass -File `$installerPath
+& pwsh -NoProfile -ExecutionPolicy Bypass -File `$installer
 "@
 
 $chromiumUpContent | Out-File -Encoding UTF8 $chromiumUpScript -Force
 
-Write-Host "Setting execution permissions for chromiumup..."
-# Not always needed in Windows, but ensure PowerShell can run the script
-if (-not (Get-Command chromiumup -ErrorAction SilentlyContinue)) {
-    $profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
-    if (-not (Test-Path $profilePath)) { New-Item -ItemType File -Path $profilePath -Force | Out-Null }
-    Add-Content $profilePath "`nSet-Alias chromiumup '$chromiumUpScript'"
+
+# --- Add alias to PowerShell profile ---
+$profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+if (-not (Test-Path $profilePath)) { New-Item -ItemType File -Path $profilePath -Force | Out-Null }
+# check if alias already exists
+$aliasLine = "Set-Alias chromiumup '$chromiumUpScript'"
+$profileContent = Get-Content $profilePath -Raw
+if ($profileContent -notmatch [regex]::Escape($aliasLine)) {
+    Add-Content $profilePath "`n$aliasLine"
 }
 
 Write-Host "`nChromium installed successfully!"
