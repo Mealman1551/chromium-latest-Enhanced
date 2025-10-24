@@ -32,8 +32,9 @@ wget -qO- https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced
 ```
 
 ## Windows
+> [!note]
+> **Note for Windows 10 users:** To run `install-windows.ps1` and `chromiumup` correctly, you need **PowerShell Core (pwsh)** installed. Windows 11 works fine with the standard PowerShell.
 
-Windows 10 not supported via command below, check end of readme.
 
 **Install:**
 
