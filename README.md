@@ -50,6 +50,10 @@ chromiumup
 ```powershell
 irm https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/uninstall-windows.ps1 | iex
 ```
+### Notes
+
+After installation do a reboot, both Linux as Windows need to initialize the `chromium` command, this is done with restarting the device.
+
 
 ### How it works (Windows)
 
