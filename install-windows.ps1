@@ -6,14 +6,6 @@ $installDir = "$env:LOCALAPPDATA\Chromium"
 $appDir = Join-Path $installDir "Application"
 $userDataDir = Join-Path $installDir "User Data"
 $tempZip = Join-Path $env:TEMP "chromium.zip"
-$installScriptPath = Join-Path $installDir "install-windows.ps1"
-
-# Als het script nog niet in installDir staat, kopieer het daarheen
-if ($MyInvocation.MyCommand.Path -ne $installScriptPath) {
-    Write-Host "Copying installer to $installScriptPath..."
-    if (-not (Test-Path $installDir)) { New-Item -ItemType Directory -Path $installDir | Out-Null }
-    Copy-Item -Path $MyInvocation.MyCommand.Path -Destination $installScriptPath -Force
-}
 
 Write-Host "Checking latest Chromium revision..."
 $latestRevision = (curl.exe -s "$baseUrl/LAST_CHANGE").Trim()
@@ -67,14 +59,31 @@ Create-Shortcut (Join-Path $startMenu $shortcutName)
 
 # ---- chromiumup command ----
 $windowsApps = "$env:LOCALAPPDATA\Microsoft\WindowsApps"
+if (-not (Test-Path $windowsApps)) { New-Item -ItemType Directory -Path $windowsApps | Out-Null }
+
 $chromiumUpScript = Join-Path $windowsApps "chromiumup.ps1"
 
-@"
+$installerPath = Join-Path $installDir "install-windows.ps1"
+
+# Ensure installer is saved for chromiumup
+Copy-Item -Path $PSCommandPath -Destination $installerPath -Force
+
+$chromiumUpContent = @"
+# chromiumup.ps1 — Update Chromium
+`$ErrorActionPreference = 'Stop'
+`$installerPath = '$installerPath'
+if (-not (Test-Path `$installerPath)) {
+    Write-Host 'Error: install-windows.ps1 not found at' `$installerPath
+    exit 1
+}
 Write-Host 'Updating Chromium...'
-& pwsh -NoProfile -ExecutionPolicy Bypass -File `"$installScriptPath`"
-"@ | Out-File -Encoding UTF8 $chromiumUpScript -Force
+& pwsh -NoProfile -ExecutionPolicy Bypass -File `$installerPath
+"@
+
+$chromiumUpContent | Out-File -Encoding UTF8 $chromiumUpScript -Force
 
 Write-Host "Setting execution permissions for chromiumup..."
+# Not always needed in Windows, but ensure PowerShell can run the script
 if (-not (Get-Command chromiumup -ErrorAction SilentlyContinue)) {
     $profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
     if (-not (Test-Path $profilePath)) { New-Item -ItemType File -Path $profilePath -Force | Out-Null }
