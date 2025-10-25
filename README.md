@@ -74,17 +74,10 @@ After installation do a reboot, both Linux as Windows need to initialize the `ch
 - No admin rights are required.
 - A reboot is recommended after installation to initialize the `chromiumup` command properly.
 
-## Windows 10
-
-Windows 10 uses a different script:
-```powershell
-irm https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install-windows10.ps1 | iex
-```
-
 ## License
 
 [Apache 2.0](/LICENSE)
 
 ---
 
-© 2025 Mealman1551
+###### &copy; 2025 Mealman1551
