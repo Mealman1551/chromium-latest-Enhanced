@@ -8,7 +8,7 @@ ICON_PATH="/usr/share/icons/hicolor/scalable/apps/chromium-latest.svg"
 
 echo "=== Chromium Latest Installer ==="
 
-echo "Updating Chromium..."
+echo "Updating/installing Chromium..."
 LASTCHANGE_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2FLAST_CHANGE?alt=media"
 REVISION=$(curl -s -S "$LASTCHANGE_URL")
 echo "Latest revision is $REVISION"
@@ -28,8 +28,21 @@ sudo rm -rf "$INSTALL_DIR"
 sudo mkdir -p "$INSTALL_DIR"
 sudo cp -r "$TMP_DIR/chrome-linux/." "$INSTALL_DIR/"
 
-echo "Creating symlink /usr/bin/chromium..."
-sudo ln -sf "$INSTALL_DIR/chrome" /usr/bin/chromium
+echo "Creating wrapper script /usr/bin/chromium..."
+sudo tee /usr/bin/chromium > /dev/null <<'EOL'
+#!/bin/bash
+FLAGS=""
+if [[ -f /etc/lsb-release ]]; then
+    DISTRO=$(grep DISTRIB_ID /etc/lsb-release | cut -d= -f2)
+    case "$DISTRO" in
+        Ubuntu|LinuxMint|Pop|elementary)
+            FLAGS="--no-sandbox"
+            ;;
+    esac
+fi
+exec /opt/chromium-latest/chrome $FLAGS "$@"
+EOL
+sudo chmod +x /usr/bin/chromium
 
 echo "Downloading icon..."
 sudo mkdir -p "$(dirname "$ICON_PATH")"
@@ -41,7 +54,7 @@ sudo tee "$DESKTOP_FILE" > /dev/null <<EOL
 Version=1.0
 Name=Chromium Latest
 Comment=The latest Chromium Browser
-Exec=$INSTALL_DIR/chrome %U
+Exec=/usr/bin/chromium %U
 Icon=$ICON_PATH
 Terminal=false
 Type=Application
@@ -67,7 +80,3 @@ echo
 echo "Installation completed!"
 echo "You can now run Chromium from the menu or type: chromium"
 echo "To update anytime, run: chromiumup"
-echo
-echo "On some Linux distributions it's required to run Chromium with:"
-echo "    chromium --no-sandbox"
-echo "The .desktop entry (GUI launcher) always works."
