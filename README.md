@@ -1,6 +1,6 @@
 # chromium-latest-Enhanced
 
-This repository is a fork of [scheib/chromium-latest-linux](https://github.com/scheib/chromium-latest-linux) and now the scripts work again and even install Chromium for you, updates with `chromiumup` command and also works for Windows 11.
+This repository is a fork of [scheib/chromium-latest-linux](https://github.com/scheib/chromium-latest-linux) and now the scripts work again and even installs Chromium for you, updates with `chromiumup` command and also works for Windows 11 and 10.
 
 This project has the name "chromium-latest-Enhanced" but its also known as; ChromiumUp.
 
