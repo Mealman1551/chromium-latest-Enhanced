@@ -2,6 +2,8 @@
 
 This repository is a fork of [scheib/chromium-latest-linux](https://github.com/scheib/chromium-latest-linux) and now the scripts work again and even install Chromium for you, updates with `chromiumup` command and also works for Windows 11.
 
+This project has the name "chromium-latest-Enhanced" but its also known as; ChromiumUp.
+
 ## Downloads
 
 Check the [release tab](https://github.com/Mealman1551/chromium-latest-Enhanced/releases) for archives with the installation scripts:
@@ -70,6 +72,12 @@ After installation do a reboot, both Linux as Windows need to initialize the `ch
    The uninstaller removes Chromium, shortcuts, the installer script, the `chromiumup` command, and optionally user data. It also cleans up the alias in your PowerShell profile.
 
 ### Notes:
+
+- No codecs
+- No WideVine
+- No API keys
+Just basic Chromium from the snapshot server from Google
+
 
 - No admin rights are required.
 - A reboot is recommended after installation to initialize the `chromiumup` command properly.
