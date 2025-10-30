@@ -8,7 +8,7 @@ ICON_PATH="/usr/share/icons/hicolor/scalable/apps/chromium-latest.svg"
 
 echo "=== Chromium Latest Installer ==="
 
-echo "Updating/installing Chromium..."
+echo "Fetching latest revision..."
 LASTCHANGE_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2FLAST_CHANGE?alt=media"
 REVISION=$(curl -s -S "$LASTCHANGE_URL")
 echo "Latest revision is $REVISION"
@@ -17,16 +17,19 @@ TMP_DIR=$(mktemp -d)
 ZIP_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F$REVISION%2Fchrome-linux.zip?alt=media"
 ZIP_FILE="$TMP_DIR/chrome-linux.zip"
 
-echo "Fetching Chromium build..."
+echo "Downloading Chromium build..."
 curl -# -L -o "$ZIP_FILE" "$ZIP_URL"
 
 echo "Unzipping..."
 unzip -q "$ZIP_FILE" -d "$TMP_DIR"
 
 echo "Installing to $INSTALL_DIR..."
-sudo rm -rf "$INSTALL_DIR"
+
+# Maak map aan als die niet bestaat
 sudo mkdir -p "$INSTALL_DIR"
-sudo cp -r "$TMP_DIR/chrome-linux/." "$INSTALL_DIR/"
+
+# Kopieer alles behalve crashpad
+sudo rsync -a --exclude 'crashpad/*' "$TMP_DIR/chrome-linux/" "$INSTALL_DIR/"
 
 echo "Creating wrapper script /usr/bin/chromium..."
 sudo tee /usr/bin/chromium > /dev/null <<'EOL'
@@ -63,20 +66,5 @@ EOL
 
 rm -rf "$TMP_DIR"
 
-echo "Installing chromiumup command..."
-sudo tee /usr/local/bin/chromiumup > /dev/null <<'EOL'
-#!/bin/bash
-set -e
-echo "Chromium Updater - Fetching latest build..."
-TMP=$(mktemp)
-curl -fsSL -o "$TMP" "https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/install.sh"
-chmod +x "$TMP"
-bash "$TMP"
-rm -f "$TMP"
-EOL
-sudo chmod +x /usr/local/bin/chromiumup
-
-echo
-echo "Installation completed!"
+echo "Installation/update completed!"
 echo "You can now run Chromium from the menu or type: chromium"
-echo "To update anytime, run: chromiumup"
