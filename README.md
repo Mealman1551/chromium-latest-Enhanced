@@ -78,6 +78,13 @@ After installation do a reboot, both Linux as Windows need to initialize the `ch
 - No API keys
 Just basic Chromium from the snapshot server from Google
 
+### Complete remove Linux
+
+You can completely remove Chromium Latest on Linux by running this:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/Mealman1551/chromium-latest-Enhanced/refs/heads/master/remove_complete.sh | bash
+```
 
 - No admin rights are required.
 - A reboot is recommended after installation to initialize the `chromiumup` command properly.
