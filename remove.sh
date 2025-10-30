@@ -5,16 +5,17 @@ INSTALL_DIR="/opt/chromium-latest"
 DESKTOP_FILE="/usr/share/applications/chromium-latest.desktop"
 SYMLINK="/usr/bin/chromium"
 
-echo "Removing Chromium installation..."
+echo "Safely removing Chromium installation..."
 
 if [ -L "$SYMLINK" ]; then
     sudo rm "$SYMLINK"
-    echo "Removed symlink $SYMLINK"
+    echo "Removed wrapper $SYMLINK"
 fi
 
 if [ -d "$INSTALL_DIR" ]; then
-    sudo rm -rf "$INSTALL_DIR"
-    echo "Removed installation directory $INSTALL_DIR"
+    # Verwijder alles behalve crashpad
+    sudo find "$INSTALL_DIR" -mindepth 1 -not -name 'crashpad' -exec rm -rf {} +
+    echo "Removed Chromium binaries but kept crashpad"
 fi
 
 if [ -f "$DESKTOP_FILE" ]; then
@@ -22,4 +23,4 @@ if [ -f "$DESKTOP_FILE" ]; then
     echo "Removed desktop entry $DESKTOP_FILE"
 fi
 
-echo "Uninstallation completed."
+echo "Safe removal completed."
