@@ -3,6 +3,31 @@
 This repository is a fork of [scheib/chromium-latest-linux](https://github.com/scheib/chromium-latest-linux) and now the scripts work again and even installs Chromium for you, updates with `chromiumup` command and also works for Windows 11 and 10.
 
 This project has the name "chromium-latest-Enhanced" but its also known as; ChromiumUp.
+> [!Warning]
+>**Important Warning for Users**
+>
+>This script installs a **custom Chromium build** alongside any existing Chromium installation.
+>
+>* It may **overwrite or conflict** with your current Chromium profile.
+>* Possible issues include:
+>
+> * Chromium failing to start due to a corrupt profile.
+> * Loss of settings, extensions, or saved passwords if using the same profile.
+>
+>To troubleshoot, launch Chromium with a temporary clean profile:
+>
+>```
+>chromium --user-data-dir=/tmp/chromium-test
+>```
+>
+>Or back up your current profile:
+>
+>```
+>mv ~/.config/chromium ~/.config/chromium.backup
+>```
+
+Use this script only if you **intend to test a separate build** and are willing to back up your profile.
+
 
 ## Downloads
 
