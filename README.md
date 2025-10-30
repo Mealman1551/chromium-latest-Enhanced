@@ -6,7 +6,7 @@ This project has the name "chromium-latest-Enhanced" but its also known as; Chro
 > [!Warning]
 >**Important Warning for Users**
 >
->This script installs a **custom Chromium build** alongside any existing Chromium installation.
+>This script installs a **direct raw snapshot Chromium build** alongside any existing Chromium installation.
 >
 >* It may **overwrite or conflict** with your current Chromium profile.
 >* Possible issues include:
@@ -25,8 +25,8 @@ This project has the name "chromium-latest-Enhanced" but its also known as; Chro
 >```
 >mv ~/.config/chromium ~/.config/chromium.backup
 >```
-
-Use this script only if you **intend to test a separate build** and are willing to back up your profile.
+>
+>Use this script only if you **intend to test a separate build** and are willing to back up your >profile.
 
 
 ## Downloads
