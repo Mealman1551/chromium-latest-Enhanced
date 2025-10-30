@@ -103,7 +103,7 @@ After installation do a reboot, both Linux as Windows need to initialize the `ch
 - No API keys
 Just basic Chromium from the snapshot server from Google
 
-### Complete remove Linux
+### Complete remove Linux (Not recommended)
 
 You can completely remove Chromium Latest on Linux by running this:
 
